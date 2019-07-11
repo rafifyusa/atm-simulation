@@ -99,8 +99,8 @@ public class ATM {
                 System.out.println("selected option");
                 switch(option) {
                     case "1":
-                        System.out.println("in case 1");
                         showWithdraw(userAccount);
+                        option = "X";
                     case "2":
                         showTransfer(userAccount);
                     case "3":
@@ -115,7 +115,7 @@ public class ATM {
     }
 
     private void showWithdraw(Account userAccount) {
-        String option;
+
         System.out.println("=================================================");
         System.out.println("1. $10");
         System.out.println("2. $50");
@@ -125,16 +125,15 @@ public class ATM {
         System.out.println("Please choose option[5]:");
 
         Scanner in = new Scanner(System.in);
-        String input = in.nextLine();
-        if(input.isEmpty()) {
+        String option = in.nextLine();
+        if(option.isEmpty()) {
             System.out.println("Withdraw cancelled");
         }
-        else if (input.length() > 1 || !input.matches("[1-5]+")){
+        else if (option.length() > 1 || !option.matches("[1-5]+")){
             System.out.println("Incorrect option");
             System.out.println(" ");
         }
         else {
-            option = in.nextLine();
             switch(option) {
                 case "1":
                     this.deductBalance(userAccount,10);
@@ -160,7 +159,7 @@ public class ATM {
         Optional<Account> optionalAccount = bank.findCredential(account.getAccountNumber(), account.getPin());
         if(optionalAccount.isPresent()){
             Account acc = optionalAccount.get();
-            System.out.println(acc.toString());
+            System.out.println(acc.getBalance());
             if (acc.getBalance() >= amount){
                 int newBalance = acc.getBalance() - amount;
                 acc.setBalance(newBalance);
