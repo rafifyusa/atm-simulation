@@ -126,10 +126,10 @@ public class ATM {
 
         Scanner in = new Scanner(System.in);
         String input = in.nextLine();
-        if(input == null) {
+        if(input.isEmpty()) {
             System.out.println("Withdraw cancelled");
         }
-        else if (input.toCharArray().length > 1 || !input.matches("[1-5]+")){
+        else if (input.length() > 1 || !input.matches("[1-5]+")){
             System.out.println("Incorrect option");
             System.out.println(" ");
         }
@@ -156,9 +156,11 @@ public class ATM {
     }
 
     private void deductBalance(Account account, int amount){
+        System.out.println("in deduct");
         Optional<Account> optionalAccount = bank.findCredential(account.getAccountNumber(), account.getPin());
         if(optionalAccount.isPresent()){
             Account acc = optionalAccount.get();
+            System.out.println(acc.toString());
             if (acc.getBalance() >= amount){
                 int newBalance = acc.getBalance() - amount;
                 acc.setBalance(newBalance);
