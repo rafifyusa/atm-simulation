@@ -51,6 +51,7 @@ public class ATM {
             }
         }
         while (!idIsValid);
+
         System.out.println("=================================================");
         do {
             System.out.println("Enter PIN: ");
@@ -69,7 +70,6 @@ public class ATM {
         while (!pinIsValid);
 
         return validateCredential(accountId, accountPin);
-
     }
 
     private Optional<Account> validateCredential(String accountId, String accountPin) {
@@ -79,7 +79,7 @@ public class ATM {
     private void showTransactionMenu(Account userAccount) {
         String option = "X";
 
-      System.out.println("=================================================");
+        System.out.println("=================================================");
         do {
             Scanner in = new Scanner(System.in);
             System.out.println("1. Withdraw");
@@ -101,17 +101,18 @@ public class ATM {
                     case "1":
                         showWithdraw(userAccount);
                         option = "X";
+                        break;
                     case "2":
                         showTransfer(userAccount);
+                        break;
                     case "3":
                         break;
                     default:
                         break;
                 }
             }
-
         }
-        while (option.equals("3"));
+        while (!option.equals("3"));
     }
 
     private void showWithdraw(Account userAccount) {
@@ -137,12 +138,17 @@ public class ATM {
             switch(option) {
                 case "1":
                     this.deductBalance(userAccount,10);
+                    option = "x";
+                    break;
                 case "2":
                     this.deductBalance(userAccount, 50);
+                    break;
                 case "3":
                     this.deductBalance(userAccount, 100);
+                    break;
                 case "4":
-                    this.showOtherDeductAmt();
+                    this.showOtherDeductAmt(userAccount);
+                    break;
                 case "5":
                     break;
                 default:
@@ -151,15 +157,45 @@ public class ATM {
         }
     }
 
-    private void showOtherDeductAmt() {
+    private void showOtherDeductAmt(Account userAccount) {
+        System.out.println("==============================");
+        System.out.println("Other Withdraw");
+        System.out.println("Enter amount to withdraw : ");
+        Scanner in = new Scanner(System.in);
+
+
+        boolean validAmount = false;
+        do {
+            String amount = in.nextLine();
+            boolean isNumeric = amount.chars().allMatch( Character::isDigit );
+            System.out.println();
+            if (amount.length() > 4 || !isNumeric || ((Integer.parseInt(amount)%10) != 0)) {
+                System.out.println("Invalid amount");
+                System.out.println("Please try again...");
+                System.out.println(" ");
+            }
+            else if (Integer.parseInt(amount) > 1000){
+                System.out.println("Maximum amount to withdraw is $1000");
+                System.out.println("Please try again...");
+                System.out.println(" ");
+            }
+            else {
+                validAmount = true;
+                deductBalance(userAccount, Integer.parseInt(amount));
+            }
+        }
+        while(!validAmount);
+
+
     }
 
     private void deductBalance(Account account, int amount){
-        System.out.println("in deduct");
+        System.out.println("==============in deduct ================");
         Optional<Account> optionalAccount = bank.findCredential(account.getAccountNumber(), account.getPin());
         if(optionalAccount.isPresent()){
             Account acc = optionalAccount.get();
-            System.out.println(acc.getBalance());
+            System.out.println("Current balance : " + acc.getBalance());
+            System.out.println("Deduct amount" + amount);
             if (acc.getBalance() >= amount){
                 int newBalance = acc.getBalance() - amount;
                 acc.setBalance(newBalance);
@@ -168,13 +204,12 @@ public class ATM {
                         .collect(Collectors.toList());
                 customers.add(acc);
                 this.showSummaryScreen(acc, amount);
+                System.out.println("========================================");
             }
             else{
                 System.out.println("Balance insufficient");
             }
-
         }
-
     }
 
     private void showSummaryScreen(Account account, int amount) {
@@ -187,6 +222,19 @@ public class ATM {
         System.out.println("1. Transaction");
         System.out.println("2. Exit");
         System.out.println("Choose option[2]: ");
+
+        Scanner in = new Scanner(System.in);
+        String option = in.nextLine();
+        if (option.length() > 1 || !option.matches("[1-2]+")) {
+            System.out.println("Invalid option");
+            System.out.println("Continuing transaction...");
+        }
+        else if(option.equals("1")){
+            System.out.println("Continuing transaction...");
+        }
+        else {
+            showWelcomeScreen();
+        }
 
     }
 
