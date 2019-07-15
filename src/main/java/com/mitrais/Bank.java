@@ -29,8 +29,14 @@ public class Bank {
                 .filter( customer -> customer.getAccountNumber().equals(accountNumber))
                 .filter( customer -> customer.getPin().equals(pin))
                 .findAny();
-
         return account;
+    }
+
+    public Optional<Account> findAccount (String accountNumber){
+        List<Account> accounts = this.customers;
+        return accounts.stream()
+                .filter(customer -> customer.getAccountNumber().equals(accountNumber))
+                .findAny();
     }
 
     public String getName() {

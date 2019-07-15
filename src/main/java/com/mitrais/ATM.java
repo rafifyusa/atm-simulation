@@ -1,5 +1,6 @@
 package com.mitrais;
-
+import java.awt.event.*;
+import javax.swing.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -185,8 +186,6 @@ public class ATM {
             }
         }
         while(!validAmount);
-
-
     }
 
     private void deductBalance(Account account, int amount){
@@ -238,5 +237,151 @@ public class ATM {
 
     }
 
-    private void showTransfer(Account userAccount){}
+    private void showTransfer(Account userAccount){
+        Scanner in = new Scanner(System.in);
+
+        System.out.println("==============================================");
+        System.out.println("Please enter destination account and");
+        System.out.println("press enter to continue or");
+        System.out.println("press cancel (Esc) to go back to Transaction:");
+        String destinationAcc = in.nextLine();
+        System.out.println("................................................");
+        System.out.println("Please enter transfer amount and");
+        System.out.println("press enter to continue or");
+        System.out.println("press cancel (Esc) to go back to Transaction:");
+        String transferAmt = in.nextLine();
+        System.out.println("................................................");
+        System.out.println("press enter to continue or");
+        System.out.println("press cancel (Esc) to go back to Transaction:");
+        System.out.println("Please enter reference number (Optional) and");
+        String referenceNum = in.nextLine();
+
+
+
+            System.out.println(
+                    "Transfer Confirmation\n" +
+                    "Destination Account : " +destinationAcc+ "\n"+
+                    "Transfer Amount     : " + transferAmt + "\n" +
+                    "Reference Number    : " + referenceNum +"\n" +
+                    "\n" +
+                    "1. Confirm Trx\n" +
+                    "2. Cancel Trx\n" +
+                    "Choose option[2]:");
+
+            String option;
+            boolean transactionIsValid;
+            do {
+                option = in.nextLine();
+                if (option.isEmpty()) {
+                    System.out.println("Transaction cancelled");
+                    option = "2";
+                }
+                else if (option.length() > 1 || !option.matches("[1-2]+")) {
+                    System.out.println("Incorrect option");
+                }
+                else {
+                    switch(option) {
+                        case "1":
+                            userAccount = bank.findAccount(userAccount.getAccountNumber()).get();
+                            transactionIsValid = validateTransfer(userAccount, destinationAcc, transferAmt, referenceNum);
+                            if (transactionIsValid) {executeTransaction(userAccount, destinationAcc, transferAmt, referenceNum);}
+                            break;
+                        case "2":
+                            break;
+                    }
+                }
+            }
+            while (!option.equals("2"));
+
+    }
+
+    private void executeTransaction(Account userAccount, String destinationAcc, String transferAmt, String referenceNum) {
+        Optional<Account> optionalAccount = bank.findCredential(userAccount.getAccountNumber(), userAccount.getPin());
+        Optional<Account> optionalDestinationAccount = bank.findAccount(destinationAcc);
+
+        if (optionalAccount.isPresent() && optionalDestinationAccount.isPresent()) {
+            Account newAccDetails = optionalAccount.get();
+            newAccDetails.setBalance(newAccDetails.getBalance() - Integer.parseInt(transferAmt));
+
+            Account newDestinationAccDetails = optionalDestinationAccount.get();
+            newDestinationAccDetails.setBalance(newDestinationAccDetails.getBalance() + Integer.parseInt(transferAmt));
+
+            List<Account> customers = bank.getCustomers().stream()
+                    .filter( c -> !c.getAccountNumber().equals(newAccDetails.getAccountNumber())
+                    && !c.getAccountNumber().equals(newDestinationAccDetails.getAccountNumber()))
+                    .collect(Collectors.toList());
+            customers.add(newAccDetails);
+            customers.add(newDestinationAccDetails);
+
+            showTransferSummary(newAccDetails, destinationAcc, transferAmt, referenceNum);
+        }
+    }
+
+    private void showTransferSummary(Account userAccount, String destinationAcc, String transferAmt, String referenceNumber) {
+        System.out.println("Fund Transfer Summary\n" +
+                "Destination Account : " + destinationAcc +"\n" +
+                "Transfer Amount     : " + transferAmt +"\n" +
+                "Reference Number    : "+referenceNumber + "\n" +
+                "Balance             : " + userAccount.getBalance() + "\n" +
+                "\n" +
+                "1. Transaction\n" +
+                "2. Exit\n" +
+                "Choose option[2]:");
+        Scanner in = new Scanner(System.in);
+        String option = in.nextLine();
+
+        if (option.isEmpty() || option.equals("2")) {
+            showWelcomeScreen();
+        }
+        else if (option.equals("1")) {
+            System.out.println();
+        }
+        else {
+            System.out.println("invalid option, returning to transaction page...");
+        }
+    }
+
+    private boolean validateTransfer(Account userAccount, String destinationAcc, String transferAmt, String referenceNum) {
+        boolean validDestinationAcc = false;
+        boolean validTransferAmt = false;
+        boolean validReferenceNum = false;
+
+        Optional<Account> destinationAccount = bank.findAccount(destinationAcc);
+        if (!isNumeric(destinationAcc) || !destinationAccount.isPresent()) {
+            System.out.println("Invalid Account");
+        }
+        else {
+            validDestinationAcc = true;
+        }
+
+        if (transferAmt.length() > 4 || !isNumeric(transferAmt)) {
+            System.out.println("Invalid amount");
+            System.out.println("Please try again...");
+            System.out.println(" ");
+        }
+        else if (Integer.parseInt(transferAmt) > 1000){
+            System.out.println("Maximum amount to transfer is $1000");
+        }
+        else if (Integer.parseInt(transferAmt) < 1){
+            System.out.println("Minimum amount to transfer is $1");
+        }
+        else if (Integer.parseInt(transferAmt) > userAccount.getBalance()) {
+            System.out.println("Insufficient balance $" + transferAmt);
+        }
+        else {
+            validTransferAmt = true;
+        }
+        if (!referenceNum.isEmpty() && !isNumeric(referenceNum)) {
+            System.out.println("Invalid Reference Number");
+        }
+        else {
+            validReferenceNum = true;
+        }
+
+        return (validDestinationAcc && validReferenceNum && validTransferAmt);
+    }
+
+    private boolean isNumeric (String string) {
+        return string.chars().allMatch( Character::isDigit );
+    }
 }
