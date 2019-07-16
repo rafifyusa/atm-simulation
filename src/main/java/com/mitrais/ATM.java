@@ -88,7 +88,7 @@ public class ATM {
             System.out.println("3. Exit");
             System.out.println("Please choose option[3]:");
             String input = in.nextLine();
-            if(input == null) {
+            if(input.isEmpty()) {
                 option = "3";
             }
             else if (input.toCharArray().length > 1 || !input.matches("[1-3]+")){

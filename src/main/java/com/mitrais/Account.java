@@ -1,11 +1,14 @@
 package com.mitrais;
 
+import java.util.List;
 
 public class Account {
     private String name;
     private String pin;
     private int balance;
     private String accountNumber;
+    private List<Transaction> transactionList;
+
 
     public Account(String name, String pin, int balance, String accountNumber) {
         this.name = name;
@@ -44,5 +47,15 @@ public class Account {
 
     public void setAccountNumber(String accountNumber) {
         this.accountNumber = accountNumber;
+    }
+
+    @Override
+    public String toString() {
+        return "Account{" +
+                "name='" + name + '\'' +
+                ", pin='" + pin + '\'' +
+                ", balance=" + balance +
+                ", accountNumber='" + accountNumber + '\'' +
+                '}';
     }
 }
