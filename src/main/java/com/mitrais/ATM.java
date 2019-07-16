@@ -2,6 +2,7 @@ package com.mitrais;
 import java.awt.event.*;
 import javax.swing.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -232,7 +233,7 @@ public class ATM {
             System.out.println("Continuing transaction...");
         }
         else {
-            showWelcomeScreen();
+            main();
         }
 
     }
@@ -310,9 +311,19 @@ public class ATM {
                     .filter( c -> !c.getAccountNumber().equals(newAccDetails.getAccountNumber())
                     && !c.getAccountNumber().equals(newDestinationAccDetails.getAccountNumber()))
                     .collect(Collectors.toList());
+
+            List<Transaction> transactions = createTransferTransaction(newAccDetails, newDestinationAccDetails, Integer.parseInt(transferAmt));
+
+            if (newAccDetails.getTransactionList() == null) {newAccDetails.setTransactionList(new ArrayList<>());}
+            if (newDestinationAccDetails.getTransactionList() == null) {newDestinationAccDetails.setTransactionList(new ArrayList<>());}
+            newAccDetails.getTransactionList().add(transactions.get(0));
+            newDestinationAccDetails.getTransactionList().add(transactions.get(1));
+
+
             customers.add(newAccDetails);
             customers.add(newDestinationAccDetails);
 
+            newAccDetails.getTransactionList().forEach(System.out::println);
             showTransferSummary(newAccDetails, destinationAcc, transferAmt, referenceNum);
         }
     }
@@ -321,7 +332,7 @@ public class ATM {
         System.out.println("Fund Transfer Summary\n" +
                 "Destination Account : " + destinationAcc +"\n" +
                 "Transfer Amount     : " + transferAmt +"\n" +
-                "Reference Number    : "+referenceNumber + "\n" +
+                "Reference Number    : "+ referenceNumber + "\n" +
                 "Balance             : " + userAccount.getBalance() + "\n" +
                 "\n" +
                 "1. Transaction\n" +
@@ -331,10 +342,10 @@ public class ATM {
         String option = in.nextLine();
 
         if (option.isEmpty() || option.equals("2")) {
-            showWelcomeScreen();
+            main();
         }
         else if (option.equals("1")) {
-            System.out.println();
+            showTransactionMenu(userAccount);
         }
         else {
             System.out.println("invalid option, returning to transaction page...");
@@ -383,5 +394,17 @@ public class ATM {
 
     private boolean isNumeric (String string) {
         return string.chars().allMatch( Character::isDigit );
+    }
+
+    private List<Transaction> createTransferTransaction(Account userAccount, Account receiverAccount, int amount) {
+        LocalDateTime time = LocalDateTime.now();
+        Transaction userTransaction = new Transaction(time, Transaction.Type.TRANSFER, amount, receiverAccount, userAccount);
+        Transaction receiverTransaction = new Transaction(time, Transaction.Type.TRANSFER, amount, userAccount, receiverAccount);
+
+        List<Transaction> transactions = new ArrayList<>();
+        transactions.add(userTransaction);
+        transactions.add(receiverTransaction);
+
+        return transactions;
     }
 }

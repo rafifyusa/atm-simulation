@@ -9,12 +9,14 @@ public class Transaction {
     private Type type;
     private int amount;
     private Account to;
+    private Account from;
 
-    public Transaction(LocalDateTime transactionDateTime, Type type, int amount, Account to) {
+    public Transaction(LocalDateTime transactionDateTime, Type type, int amount, Account to, Account from) {
         this.transactionDateTime = transactionDateTime;
         this.type = type;
         this.amount = amount;
         this.to = to;
+        this.from = from;
     }
 
     public Transaction(LocalDateTime transactionDateTime, Type type, int amount) {
@@ -53,5 +55,20 @@ public class Transaction {
 
     public void setTo(Account to) {
         this.to = to;
+    }
+
+    public Account getFrom() {
+        return from;
+    }
+
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "transactionDateTime=" + transactionDateTime +
+                ", type=" + type +
+                ", amount=" + amount +
+                ", to=" + to.getName() +
+                ", from=" + from.getName() +
+                '}';
     }
 }

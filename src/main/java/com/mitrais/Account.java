@@ -10,6 +10,14 @@ public class Account {
     private List<Transaction> transactionList;
 
 
+    public List<Transaction> getTransactionList() {
+        return transactionList;
+    }
+
+    public void setTransactionList(List<Transaction> transactionList) {
+        this.transactionList = transactionList;
+    }
+
     public Account(String name, String pin, int balance, String accountNumber) {
         this.name = name;
         this.pin = pin;
@@ -56,6 +64,7 @@ public class Account {
                 ", pin='" + pin + '\'' +
                 ", balance=" + balance +
                 ", accountNumber='" + accountNumber + '\'' +
+                ", transactionList=" + transactionList +
                 '}';
     }
 }
