@@ -63,12 +63,17 @@ public class Transaction {
 
     @Override
     public String toString() {
-        return "Transaction{" +
-                "transactionDateTime=" + transactionDateTime +
-                ", type=" + type +
-                ", amount=" + amount +
-                ", to=" + to.getName() +
-                ", from=" + from.getName() +
-                '}';
+        if (to != null) {
+            return "Transaction Date : " + transactionDateTime +
+                    ", Type : " + type +
+                    ", Amount Transfered: " + amount +
+                    ", To : " + to.getName() +
+                    ", From : " + from.getName();
+        }
+        else {
+            return "Transaction Date : " + transactionDateTime +
+                    ", Type : " + type +
+                    ", Amount Withdrawn : " + amount;
+        }
     }
 }

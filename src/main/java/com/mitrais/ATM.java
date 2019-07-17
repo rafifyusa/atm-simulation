@@ -34,7 +34,7 @@ public class ATM {
         String accountPin;
 
         System.out.println("=================================================");
-        System.out.println("Welcome to Mitrais Bank");
+        System.out.println("             Welcome to Mitrais Bank");
         System.out.println("Please insert your account detail to continue...");
         System.out.println("=================================================");
 
@@ -54,7 +54,6 @@ public class ATM {
         }
         while (!idIsValid);
 
-        System.out.println("=================================================");
         do {
             System.out.println("Enter PIN: ");
             accountPin = in.nextLine();
@@ -81,20 +80,20 @@ public class ATM {
     private void showTransactionMenu(Account userAccount) {
         String option = "X";
 
-        System.out.println("=================================================");
         do {
             Scanner in = new Scanner(System.in);
-            System.out.println("1. Withdraw");
-            System.out.println("2. Fund Transfer");
-            System.out.println("3. Exit");
-            System.out.println("Please choose option[3]:");
+            System.out.println("================= Transaction Screen =================\n" +
+                    "1. Withdraw\n" +
+                    "2. Fund Transfer\n" +
+                    "3. Transaction History\n"+
+                    "4. Exit\n" +
+                    "Please choose option[4]:");
             String input = in.nextLine();
             if(input.isEmpty()) {
-                option = "3";
+                option = "4";
             }
-            else if (input.toCharArray().length > 1 || !input.matches("[1-3]+")){
+            else if (input.toCharArray().length > 1 || !input.matches("[1-4]+")){
                 System.out.println("Incorrect option");
-                System.out.println(" ");
             }
             else {
                 option = input;
@@ -108,24 +107,58 @@ public class ATM {
                         showTransfer(userAccount);
                         break;
                     case "3":
+                        showHistory(userAccount);
+                        break;
+                    case "4" :
                         break;
                     default:
                         break;
                 }
             }
         }
-        while (!option.equals("3"));
+        while (!option.equals("4"));
+    }
+
+    private void showHistory(Account userAccount) {
+        System.out.println("================= History Screen ================\n" +
+                "Your 10 most Recent Transactions:");
+
+        Optional<Account> user = bank.findAccount(userAccount.getAccountNumber());
+        user.ifPresent(value -> {
+            List<Transaction> transactionsHistory = value.getTransactionList();
+            transactionsHistory.forEach(System.out::println);
+        });
+        System.out.println("Current Balance : " + user.get().getBalance());
+
+        showMenuWithTwoSelection();
+    }
+
+    private void showMenuWithTwoSelection () {
+        System.out.println("\n1. Transaction\n" +
+                "2. Exit\n" +
+                "Please choose option [2]");
+        Scanner in = new Scanner(System.in);
+        String option = in.nextLine();
+        if (option.length() > 1 || !option.matches("[1-2]+")) {
+            System.out.println("Invalid option");
+            System.out.println("Continuing transaction...");
+        }
+        else if(option.equals("1")){
+            System.out.println("Continuing transaction...");
+        }
+        else {
+            main();
+        }
     }
 
     private void showWithdraw(Account userAccount) {
-
-        System.out.println("=================================================");
-        System.out.println("1. $10");
-        System.out.println("2. $50");
-        System.out.println("3. $100");
-        System.out.println("4. Other");
-        System.out.println("5. Back");
-        System.out.println("Please choose option[5]:");
+        System.out.println("================ Withdraw Screen =================\n" +
+                "1. $10\n" +
+                "2. $50\n" +
+                "3. $100\n" +
+                "4. Other\n" +
+                "5. Back\n" +
+                "Please choose option[5]:");
 
         Scanner in = new Scanner(System.in);
         String option = in.nextLine();
@@ -140,7 +173,6 @@ public class ATM {
             switch(option) {
                 case "1":
                     this.deductBalance(userAccount,10);
-                    option = "x";
                     break;
                 case "2":
                     this.deductBalance(userAccount, 50);
@@ -190,7 +222,7 @@ public class ATM {
     }
 
     private void deductBalance(Account account, int amount){
-        System.out.println("==============in deduct ================");
+        System.out.println("============== Deducting Balance ================");
         Optional<Account> optionalAccount = bank.findCredential(account.getAccountNumber(), account.getPin());
         if(optionalAccount.isPresent()){
             Account acc = optionalAccount.get();
@@ -199,12 +231,14 @@ public class ATM {
             if (acc.getBalance() >= amount){
                 int newBalance = acc.getBalance() - amount;
                 acc.setBalance(newBalance);
+                Transaction withdrawTransaction = createWithdrawTransaction(amount);
+                acc.getTransactionList().add(withdrawTransaction);
+
                 List<Account> customers = bank.getCustomers().stream()
                         .filter( c -> !c.getAccountNumber().equals(account.getAccountNumber()))
                         .collect(Collectors.toList());
                 customers.add(acc);
                 this.showSummaryScreen(acc, amount);
-                System.out.println("========================================");
             }
             else{
                 System.out.println("Balance insufficient");
@@ -212,52 +246,41 @@ public class ATM {
         }
     }
 
+    private Transaction createWithdrawTransaction(int amount) {
+        return new Transaction(LocalDateTime.now(), Transaction.Type.WITHDRAW, amount);
+    }
+
     private void showSummaryScreen(Account account, int amount) {
         LocalDateTime transactionTime = LocalDateTime.now();
-        System.out.println("Summary");
-        System.out.println("Date : " + transactionTime);
-        System.out.println("Withdraw : $" + amount);
-        System.out.println("Balance : $" + account.getBalance());
-        System.out.println(" ");
-        System.out.println("1. Transaction");
-        System.out.println("2. Exit");
-        System.out.println("Choose option[2]: ");
-
-        Scanner in = new Scanner(System.in);
-        String option = in.nextLine();
-        if (option.length() > 1 || !option.matches("[1-2]+")) {
-            System.out.println("Invalid option");
-            System.out.println("Continuing transaction...");
-        }
-        else if(option.equals("1")){
-            System.out.println("Continuing transaction...");
-        }
-        else {
-            main();
-        }
-
+        System.out.println("Summary\n" +
+                "Date : " + transactionTime + "\n" +
+                "Withdraw : $" + amount + "\n" +
+                "Balance : $" + account.getBalance()
+                );
+       showMenuWithTwoSelection();
     }
 
     private void showTransfer(Account userAccount){
         Scanner in = new Scanner(System.in);
 
-        System.out.println("==============================================");
-        System.out.println("Please enter destination account and");
-        System.out.println("press enter to continue or");
-        System.out.println("press cancel (Esc) to go back to Transaction:");
+        System.out.println("================ Transfer Screen =================\n" +
+                "Please enter destination account and\n " +
+                "press enter to continue or \n" +
+                "press cancel (Esc) to go back to Transaction:"
+        );
         String destinationAcc = in.nextLine();
-        System.out.println("................................................");
-        System.out.println("Please enter transfer amount and");
-        System.out.println("press enter to continue or");
-        System.out.println("press cancel (Esc) to go back to Transaction:");
+        System.out.println("................................................\n" +
+                "Please enter transfer amount and\n" +
+                "press enter to continue or \n" +
+                "press cancel (Esc) to go back to Transaction:"
+        );
         String transferAmt = in.nextLine();
-        System.out.println("................................................");
-        System.out.println("press enter to continue or");
-        System.out.println("press cancel (Esc) to go back to Transaction:");
-        System.out.println("Please enter reference number (Optional) and");
+        System.out.println("................................................\n" +
+                "Please enter reference number (Optional) and\n" +
+                "press enter to continue or \n" +
+                "press cancel (Esc) to go back to Transaction:"
+                );
         String referenceNum = in.nextLine();
-
-
 
             System.out.println(
                     "Transfer Confirmation\n" +
@@ -399,7 +422,7 @@ public class ATM {
     private List<Transaction> createTransferTransaction(Account userAccount, Account receiverAccount, int amount) {
         LocalDateTime time = LocalDateTime.now();
         Transaction userTransaction = new Transaction(time, Transaction.Type.TRANSFER, amount, receiverAccount, userAccount);
-        Transaction receiverTransaction = new Transaction(time, Transaction.Type.TRANSFER, amount, userAccount, receiverAccount);
+        Transaction receiverTransaction = new Transaction(time, Transaction.Type.TRANSFER, amount, receiverAccount, userAccount);
 
         List<Transaction> transactions = new ArrayList<>();
         transactions.add(userTransaction);

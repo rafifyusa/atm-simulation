@@ -1,5 +1,6 @@
 package com.mitrais;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Account {
@@ -23,6 +24,7 @@ public class Account {
         this.pin = pin;
         this.balance = balance;
         this.accountNumber = accountNumber;
+        this.transactionList = new ArrayList<>();
     }
 
     public String getName() {
