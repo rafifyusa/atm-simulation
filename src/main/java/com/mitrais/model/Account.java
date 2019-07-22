@@ -1,4 +1,4 @@
-package com.mitrais;
+package com.mitrais.model;
 
 import java.util.ArrayList;
 import java.util.List;

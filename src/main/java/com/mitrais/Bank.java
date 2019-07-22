@@ -1,5 +1,7 @@
 package com.mitrais;
 
+import com.mitrais.model.Account;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
