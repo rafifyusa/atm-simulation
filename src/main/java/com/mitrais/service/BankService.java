@@ -1,4 +1,4 @@
-package com.mitrais;
+package com.mitrais.service;
 
 import com.mitrais.model.Account;
 
@@ -10,11 +10,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-public class Bank {
+public class BankService {
     private String name;
     private List<Account> customers;
 
-    public Bank(String name) {
+    public BankService(String name) {
         this.name = name;
     }
 

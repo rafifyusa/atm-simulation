@@ -1,6 +1,6 @@
 package com.mitrais;
 
-import java.util.List;
+import com.mitrais.service.BankService;
 
 /**
  * Hello world!
@@ -10,10 +10,7 @@ public class App
 {
     public static void main( String[] args )
     {
-        Bank bank = new Bank("Mit Bank");
-        bank.initialize();
-        ATM atm = new ATM(bank);
+        ATM atm = new ATM();
         atm.main();
-
     }
 }
