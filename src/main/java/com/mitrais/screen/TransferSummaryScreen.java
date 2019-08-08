@@ -2,8 +2,7 @@ package com.mitrais.screen;
 
 import com.mitrais.ATM;
 import com.mitrais.model.Account;
-
-import java.util.Scanner;
+import com.mitrais.utils.Utility;
 
 public class TransferSummaryScreen {
 
@@ -17,8 +16,8 @@ public class TransferSummaryScreen {
                 "1. Transaction\n" +
                 "2. Exit\n" +
                 "Choose option[2]:");
-        Scanner in = new Scanner(System.in);
-        String option = in.nextLine();
+
+        String option = Utility.getScanner().nextLine();
 
         if (option.isEmpty() || option.equals("2")) {
             ATM.main();

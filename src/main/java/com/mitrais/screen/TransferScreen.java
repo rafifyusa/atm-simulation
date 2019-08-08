@@ -9,17 +9,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class TransferScreen {
     private Account userAccount;
-    private Scanner in;
     private BankService bankService;
 
-    public TransferScreen(Account userAccount, Scanner in, BankService bankService) {
+    public TransferScreen(Account userAccount, BankService bankService) {
         this.userAccount = userAccount;
-        this.in = in;
         this.bankService = bankService;
     }
 
@@ -37,7 +34,7 @@ public class TransferScreen {
                     "press enter to continue or \n" +
                     "press cancel (Esc) to go back to Transaction:"
             );
-            destinationAcc = in.nextLine();
+            destinationAcc = Utility.getScanner().nextLine();
             validDestinationAcc = validateDestinationAcc(destinationAcc);
         }
 
@@ -47,7 +44,7 @@ public class TransferScreen {
                     "press enter to continue or \n" +
                     "press cancel (Esc) to go back to Transaction:"
             );
-            transferAmt = in.nextLine();
+            transferAmt = Utility.getScanner().nextLine();
             validTransferAmt = validateTransferAmt(transferAmt, userAccount);
         }
 
@@ -57,7 +54,7 @@ public class TransferScreen {
                     "press enter to continue or \n" +
                     "press cancel (Esc) to go back to Transaction:"
             );
-            referenceNum = in.nextLine();
+            referenceNum = Utility.getScanner().nextLine();
             validReferenceNum = validateReferenceNum(referenceNum);
         }
 
@@ -74,10 +71,9 @@ public class TransferScreen {
         boolean validOption = false;
         String option;
         do {
-            option = in.nextLine();
+            option = Utility.getScanner().nextLine();
             if (option.isEmpty()) {
                 System.out.println("Transaction cancelled");
-                option = "2";
                 validOption = true;
             }
             else if (option.length() > 1 || !option.matches("[1-2]+")) {
@@ -86,7 +82,7 @@ public class TransferScreen {
             else {
                 switch(option) {
                     case "1":
-                        Optional<Account> freshUserData = bankService.findAccount(userAccount.getAccountNumber());
+                        Optional<Account> freshUserData = bankService.findCustomer(userAccount.getAccountNumber());
                         if (freshUserData.isPresent()){
                             userAccount = freshUserData.get();
                             executeTransaction(userAccount, destinationAcc, transferAmt, referenceNum);
@@ -103,7 +99,7 @@ public class TransferScreen {
     }
 
     private boolean validateDestinationAcc (String destinationAcc) {
-        Optional<Account> destinationAccount = bankService.findAccount(destinationAcc);
+        Optional<Account> destinationAccount = bankService.findCustomer(destinationAcc);
         if (!Utility.isNumeric(destinationAcc) || !destinationAccount.isPresent()) {
             System.out.println("Invalid Account");
             return false;
@@ -147,7 +143,7 @@ public class TransferScreen {
 
     private void executeTransaction(Account userAccount, String destinationAcc, String transferAmt, String referenceNum) {
         Optional<Account> optionalAccount = bankService.findCredential(userAccount.getAccountNumber(), userAccount.getPin());
-        Optional<Account> optionalDestinationAccount = bankService.findAccount(destinationAcc);
+        Optional<Account> optionalDestinationAccount = bankService.findCustomer(destinationAcc);
 
         if (optionalAccount.isPresent() && optionalDestinationAccount.isPresent()) {
             Account newAccDetails = optionalAccount.get();
@@ -156,7 +152,7 @@ public class TransferScreen {
             Account newDestinationAccDetails = optionalDestinationAccount.get();
             newDestinationAccDetails.setBalance(newDestinationAccDetails.getBalance() + Integer.parseInt(transferAmt));
 
-            List<Account> customers = bankService.getCustomers().stream()
+            List<Account> customers = bankService.findAllCustomers().stream()
                     .filter( c -> !c.getAccountNumber().equals(newAccDetails.getAccountNumber())
                             && !c.getAccountNumber().equals(newDestinationAccDetails.getAccountNumber()))
                     .collect(Collectors.toList());

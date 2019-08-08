@@ -8,17 +8,14 @@ import com.mitrais.utils.Utility;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 
-public class WithdrawScreen {
+class WithdrawScreen {
     private Account userAccount;
-    private Scanner in;
     private BankService bankService;
 
-    public WithdrawScreen(Account userAccount, Scanner in, BankService bankService) {
+    WithdrawScreen(Account userAccount, BankService bankService) {
         this.userAccount = userAccount;
-        this.in = in;
         this.bankService = bankService;
     }
 
@@ -31,7 +28,7 @@ public class WithdrawScreen {
                 "5. Back\n" +
                 "Please choose option[5]:");
 
-        String option = in.nextLine();
+        String option = Utility.getScanner().nextLine();
         if(option.isEmpty()) {
             System.out.println("Withdraw cancelled");
         }
@@ -65,12 +62,10 @@ public class WithdrawScreen {
         System.out.println("==============================");
         System.out.println("Other Withdraw");
         System.out.println("Enter amount to withdraw : ");
-        Scanner in = new Scanner(System.in);
-
 
         boolean validAmount = false;
         do {
-            String amount = in.nextLine();
+            String amount = Utility.getScanner().nextLine();
 
             if (amount.length() > 4 || !Utility.isNumeric(amount) || ((Integer.parseInt(amount)%10) != 0)) {
                 System.out.println("Invalid amount");
@@ -101,7 +96,7 @@ public class WithdrawScreen {
                 Transaction withdrawTransaction = createWithdrawTransaction(amount);
                 acc.getTransactionList().add(withdrawTransaction);
 
-                List<Account> customers = bankService.getCustomers().stream()
+                List<Account> customers = bankService.findAllCustomers().stream()
                         .filter( c -> !c.getAccountNumber().equals(account.getAccountNumber()))
                         .collect(Collectors.toList());
                 customers.add(acc);

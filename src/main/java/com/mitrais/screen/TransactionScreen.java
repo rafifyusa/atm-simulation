@@ -2,17 +2,14 @@ package com.mitrais.screen;
 
 import com.mitrais.model.Account;
 import com.mitrais.service.BankService;
-
-import java.util.Scanner;
+import com.mitrais.utils.Utility;
 
 public class TransactionScreen {
     private Account userAccount;
-    private Scanner in;
     private BankService bankService;
 
-    public TransactionScreen(Account userAccount, Scanner in, BankService bankService) {
+    public TransactionScreen(Account userAccount, BankService bankService) {
         this.userAccount = userAccount;
-        this.in = in;
         this.bankService = bankService;
     }
 
@@ -24,11 +21,12 @@ public class TransactionScreen {
                     "1. Withdraw\n" +
                     "2. Fund Transfer\n" +
                     "3. Transaction History\n"+
-                    "4. Exit\n" +
-                    "Please choose option[4]:");
-            String input = in.nextLine();
+                    "4. Load New Customers From CSV\n" +
+                    "5. Exit\n" +
+                    "Please choose option[5]:");
+            String input = Utility.getScanner().nextLine();
             if(input.isEmpty()) {
-                option = "4";
+                option = "5";
             }
             else if (input.toCharArray().length > 1 || !input.matches("[1-4]+")){
                 System.out.println("Incorrect option");
@@ -38,12 +36,12 @@ public class TransactionScreen {
                 System.out.println("selected option");
                 switch(option) {
                     case "1":
-                        WithdrawScreen withdrawScreen = new WithdrawScreen(userAccount, in, bankService);
+                        WithdrawScreen withdrawScreen = new WithdrawScreen(userAccount, bankService);
                         withdrawScreen.showWithdraw();
                         option = "X";
                         break;
                     case "2":
-                        TransferScreen transferScreen = new TransferScreen(userAccount, in, bankService);
+                        TransferScreen transferScreen = new TransferScreen(userAccount, bankService);
                         transferScreen.showTransfer();
                         break;
                     case "3":
@@ -51,12 +49,16 @@ public class TransactionScreen {
                         transactionHistoryScreen.showHistory();
                         break;
                     case "4" :
+                        LoadCsvScreen loadCsvScreen = new LoadCsvScreen(bankService);
+                        loadCsvScreen.showLoadMenu();
+                        break;
+                    case "5" :
                         break;
                     default:
                         break;
                 }
             }
         }
-        while (!option.equals("4"));
+        while (!option.equals("5"));
     }
 }

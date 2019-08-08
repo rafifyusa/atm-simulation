@@ -6,7 +6,6 @@ import com.mitrais.service.BankService;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Scanner;
 
 public class TransactionHistoryScreen {
     private Account userAccount;
@@ -21,7 +20,7 @@ public class TransactionHistoryScreen {
         System.out.println("================= History Screen ================\n" +
                 "Your 10 most Recent Transactions:");
 
-        Optional<Account> user = bankService.findAccount(userAccount.getAccountNumber());
+        Optional<Account> user = bankService.findCustomer(userAccount.getAccountNumber());
         user.ifPresent(value -> {
             List<Transaction> transactionsHistory = value.getTransactionList();
             transactionsHistory.forEach(System.out::println);

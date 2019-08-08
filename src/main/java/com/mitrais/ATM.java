@@ -5,8 +5,6 @@ import com.mitrais.screen.WelcomeScreen;
 import com.mitrais.service.BankService;
 
 import java.util.Optional;
-import java.util.Scanner;
-
 
 public class ATM {
     public ATM() {
@@ -14,17 +12,15 @@ public class ATM {
 
     public static void main() {
         boolean running = true;
-        BankService bankService = new BankService("Mitrais Bank");
-        bankService.initialize();
-        Scanner in = new Scanner(System.in);
+        BankService bankService = new BankService();
 
         do{
-            WelcomeScreen welcomeScreen = new WelcomeScreen(in, bankService);
+            WelcomeScreen welcomeScreen = new WelcomeScreen(bankService);
             Optional<Account> user = welcomeScreen.showWelcomeScreen();
             if (user.isPresent()) {
                 Account userAccount = user.get();
 
-                TransactionScreen transactionScreen = new TransactionScreen(userAccount,in, bankService);
+                TransactionScreen transactionScreen = new TransactionScreen(userAccount,bankService);
                 transactionScreen.showTransactionScreen();
             }
         }

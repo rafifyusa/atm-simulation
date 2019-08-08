@@ -1,8 +1,7 @@
 package com.mitrais.screen;
 
 import com.mitrais.ATM;
-
-import java.util.Scanner;
+import com.mitrais.utils.Utility;
 
 public class Menu {
 
@@ -10,8 +9,8 @@ public class Menu {
         System.out.println("\n1. Transaction\n" +
                 "2. Exit\n" +
                 "Please choose option [2]");
-        Scanner in = new Scanner(System.in);
-        String option = in.nextLine();
+
+        String option = Utility.getScanner().nextLine();
         if (option.length() > 1 || !option.matches("[1-2]+")) {
             System.out.println("Invalid option");
             System.out.println("Continuing transaction...");
